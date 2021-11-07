@@ -1,15 +1,21 @@
 import { NextPage } from "next";
 import { client } from "../../lib/cms";
+import { Post } from "../../lib/types";
+import PostCard from "../../components/PostCard";
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
+
 
 interface PostProps {
-    data: any;
+    post: Post;
 }
 
-
-const Post: NextPage<PostProps> =({data}) =>{
+const Post: NextPage<PostProps> =({ post }) =>{
+    const Content = documentToReactComponents(post.fields.content);
+    
     return(
         <div>
-            <h1>{data.fields.heading}</h1>
+            <PostCard post={post} />
+            {documentToReactComponents(post.fields.content)}
         </div>
     );
 };
@@ -34,17 +40,17 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async ({params}: {params:any}) => { //type objects
 
     console.log(params);
-    const data = await client
+    const post = await client
     .getEntry(params.post)
   .then((response: any) => response)
   .catch(console.error);
 
-  console.log("data: ", data);
+  console.log("data: ", post);
 
   
     return {
         props: {
-            data}
+            post}
     }
 };
 
